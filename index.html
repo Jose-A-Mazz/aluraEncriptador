@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafío Encriptador Alura</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <img src="./assets/Frame 6.png" alt="alura-image">
+    </header>
+    <form class="ingresar-texto">
+        <label for="texto"></label>
+        <textarea rows="20" cols="100" id="texto" value="" placeholder="Ingresa el texto aquí"
+            oninput="mostrarImagen()"></textarea>
+        <div class="contenedor-botones">
+            <p><img src="./assets/exclamacion.svg" alt="advertencia"> Solo letras minúsculas y sin acentos</p>
+            <button onclick="cifrarTexto()" class="boton-encriptar">
+                Encriptar
+            </button>
+            <button class="boton-desencriptar" onclick="desencriptar()">
+                Desencriptar
+            </button>
+        </div>
+    </form>
+    <article class="mostrar-texto">
+        <div class="box-mostrar">
+            <p></p>
+        </div>
+        <div class="mensaje-sin-ingresar">
+            <img id="imagen-busqueda" src="./assets/imagen-muneco.png" alt="imagen de una persona buscando">
+            <h2>Ningún mensaje fue encontrado</h2>
+            <p>Ingresa el texto que desees encriptar o desencriptar.</p>
+
+        </div>
+    </article>
+    <script src="./app.js"></script>
+</body>
+
+</html>
