@@ -30,7 +30,6 @@ window.onload = (e) => {
     const blob = new Blob([texto], { type: "text/plain" });
     const data = [new ClipboardItem({ ["text/plain"]: blob })];
     await navigator.clipboard.write(data);
-    let content = await navigator.clipboard.read();
   });
 
   botonCopiar.setAttribute("class", "boton-copiar");
@@ -276,6 +275,7 @@ function desencriptar() {
     crearMensajeDeValidacion(mensajeDeValidacion, desencriptar);
   } else {
     descifrar(textoParaDesencriptar);
+    agregarBotonCopiar();
   }
 }
 
