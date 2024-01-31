@@ -86,6 +86,18 @@ textarea::placeholder {
 
 }
 
+/* animacion ingresar texto */
+
+@keyframes animacion-ingresar-texto {
+    from {
+        box-shadow: 2px 5px 7px 2px rgba(211, 211, 211, 0.3);
+    }
+
+    to {
+        box-shadow: 2px 5px 15px 10px rgba(255, 245, 245, 0.4);
+    }
+}
+
 .mostrar-texto p {
     font-size: x-large;
     line-height: 2rem;
@@ -118,6 +130,8 @@ textarea::placeholder {
     width: 100%;
     min-height: 20%;
     color: #495057;
+    overflow-y: scroll;
+    max-height: 50%
 }
 
 #imagen-busqueda {

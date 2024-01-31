@@ -178,7 +178,43 @@ function ocultarImagen() {
   imagen.style.display = "none";
 }
 
+function crearCuadroDeDialogo(
+  textoVacio,
+  listaDeMensajes,
+  tipoDeProceso,
+  mensajeDeValidacion
+) {
+  let dialog = document.querySelector(".caja-mensaje-validacion");
+  dialog = document.createElement("div");
+  dialogButton = document.createElement("button");
+  dialogButton.textContent = textoVacio ? "Cerrar" : "Corregir errores";
+  dialogButton.addEventListener("click", (e) => {
+    e.target.classList.add("boton-clickado");
+    e.target.textContent = "Done";
+    if (textoVacio) {
+      eliminarMensajeValidacion();
+    } else {
+      corregirErrores(mensajeDeValidacion, tipoDeProceso);
+    }
+  });
+  dialogButton.setAttribute("class", "dialog-btn");
+  dialog.addEventListener("animationend", (e) => {
+    if (e.target.style.animationName === "entradaMensajeValidacion") {
+      e.target.style.top = "10%";
+    } else {
+      e.target.style.top = "-15%";
+    }
+  });
+  dialog.innerHTML = `<ul>${listaDeMensajes}</ul>`;
+  dialog.insertAdjacentElement("beforeend", dialogButton);
+  dialog.setAttribute("class", "caja-mensaje-validacion");
+  dialog.style.top = `${parteSuperiorTextArea}`;
+  document.body.appendChild(dialog);
+  dialog.style.animation = "entradaMensajeValidacion .2s ease-out";
+}
+
 function corregirErrores(mensajeDeValidacion, tipoDeProceso) {
+  console.log(mensajeDeValidacion);
   for (const key in mensajeDeValidacion) {
     if (key !== "mensajeTextoVacio") {
       mensajeDeValidacion[key].aplicarCorreccion(textArea.value);
@@ -187,55 +223,34 @@ function corregirErrores(mensajeDeValidacion, tipoDeProceso) {
 
   setTimeout(() => {
     eliminarMensajeValidacion();
-    tipoDeProceso();
+    procesarTexto(tipoDeProceso);
   }, 200);
 }
 
 //se lanza un error
 
 function crearMensajeDeValidacion(mensajeDeValidacion, tipoDeProceso) {
-  let dialog = document.querySelector(".caja-mensaje-validacion");
+  //los valores del objeto de validacion se meten en array y luego se transforman en string
+  //para tener estructura de HTML
+
   let listaDeMensajes = Object.values(mensajeDeValidacion)
     .map((mensaje) => `<li>✖️ ${mensaje.msj}</li>`)
     .join("");
   // toggleButonEncriptar(mensajeDeValidacion);
 
-  if (dialog) {
-    dialog.innerHTML = `<ul>${listaDeMensajes}</ul>`;
-  } else {
-    const textoVacio = "mensajeTextoVacio" in mensajeDeValidacion;
+  //comprueba si no hay valor dentro del textarea
+  const textoVacio = "mensajeTextoVacio" in mensajeDeValidacion;
 
-    dialog = document.createElement("div");
-    dialogButton = document.createElement("button");
-    dialogButton.textContent = textoVacio ? "Cerrar" : "Corregir errores";
-    dialogButton.addEventListener("click", (e) => {
-      e.target.classList.add("boton-clickado");
-      e.target.textContent = "Done";
-      if (textoVacio) {
-        eliminarMensajeValidacion();
-      } else {
-        corregirErrores(mensajeDeValidacion, tipoDeProceso);
-      }
-    });
-
-    dialogButton.setAttribute("class", "dialog-btn");
-    dialog.addEventListener("animationend", (e) => {
-      if (e.target.style.animationName === "entradaMensajeValidacion") {
-        e.target.style.top = "10%";
-      } else {
-        e.target.style.top = "-15%";
-      }
-    });
-    dialog.innerHTML = `<ul>${listaDeMensajes}</ul>`;
-    dialog.insertAdjacentElement("beforeend", dialogButton);
-    dialog.setAttribute("class", "caja-mensaje-validacion");
-    dialog.style.top = `${parteSuperiorTextArea}`;
-    document.body.appendChild(dialog);
-    dialog.style.animation = "entradaMensajeValidacion .2s ease-out";
-  }
+  // crea cuadro de diálogo
+  crearCuadroDeDialogo(
+    textoVacio,
+    listaDeMensajes,
+    tipoDeProceso,
+    mensajeDeValidacion
+  );
 }
 
-function eliminarMensajeValidacion(mensajeDeValidacion = undefined) {
+function eliminarMensajeValidacion() {
   let dialog = document.querySelector(".caja-mensaje-validacion");
   dialog.style.animation = "salidaMensajeValidacion .3s ease-in";
   // toggleButonEncriptar(mensajeDeValidacion);
@@ -253,30 +268,29 @@ function toggleButonEncriptar(mensajeDeValidacion) {
   }
 }
 
-function cifrarTexto() {
+function procesarTexto(tipoDeProceso) {
   let [validacionIncorrecta, mensajeDeValidacion] = validacion(textArea.value);
+  let texto = textArea.value;
   if (validacionIncorrecta) {
-    crearMensajeDeValidacion(mensajeDeValidacion, cifrarTexto);
+    crearMensajeDeValidacion(mensajeDeValidacion, tipoDeProceso);
   } else {
-    const textoEncriptado = encriptar(textArea.value);
-    insertarTextoEnCaja(textoEncriptado);
+    texto = tipoDeProceso(texto);
+    insertarTextoEnCaja(texto);
     ocultarImagen();
     agregarBotonCopiar();
+    panelDeTextos.style.animation = "animacion-ingresar-texto .6s ease";
+    setTimeout(() => {
+      panelDeTextos.style.animation = "";
+    }, 700);
   }
 }
 
-function desencriptar() {
-  textoParaDesencriptar = textArea.value;
-  let [validacionIncorrecta, mensajeDeValidacion] = validacion(
-    textoParaDesencriptar
-  );
+function manejarCifrado() {
+  procesarTexto(encriptar);
+}
 
-  if (validacionIncorrecta) {
-    crearMensajeDeValidacion(mensajeDeValidacion, desencriptar);
-  } else {
-    descifrar(textoParaDesencriptar);
-    agregarBotonCopiar();
-  }
+function manejarDescifrado() {
+  procesarTexto(descifrar);
 }
 
 async function agregarBotonCopiar() {
@@ -292,6 +306,5 @@ function descifrar(textoParaDesencriptar) {
     }
   }
 
-  insertarTextoEnCaja(textoParaDesencriptar);
-  ocultarImagen();
+  return textoParaDesencriptar;
 }
