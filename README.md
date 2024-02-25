@@ -1,2 +1,3 @@
-# aluraEncriptador
-Oracle Next Education- Encriptador/Desencriptador
+<h1>Desafío Encriptador Alura</h1>
+
+- Estado del proyecto: finalizado
